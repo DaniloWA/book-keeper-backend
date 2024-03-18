@@ -17,12 +17,12 @@ return new class extends Migration
             $table->unsignedBigInteger('author_id');
             $table->string('name');
             $table->year('year'); 
-            $table->string('gene');
+            $table->string('genre');
             $table->string('cover_img');
             $table->integer('pages');
             $table->text('description');
 
-            $table->foreign('author_id')->references('id')->on('author_id');
+            $table->foreign('author_id')->references('id')->on('author');
 
             $table->timestamps();
         });
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('books');
+        Schema::dropIfExists('book');
     }
 };
