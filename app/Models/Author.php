@@ -14,7 +14,7 @@ class Author extends Model
      *
      * @var string
      */
-    protected $table = 'my_flights';
+    protected $table = 'author';
 
 
     /**
