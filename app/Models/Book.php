@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Book extends Model
+{
+    use HasFactory;
+    
+    
+    protected $table = 'books';
+    
+    protected $fillable = [  
+     'uuid',
+     'author_id',
+     'name',
+     'year',
+     'genre',
+     'cover_img',
+     'pages',
+     'description'
+        ];
+    
+        public function author()
+        {
+            return $this->belongsTo(Author::class,'author_id','id');
+        }
+    }
+
