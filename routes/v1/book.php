@@ -1,24 +1,9 @@
-<?php
-use App\Http\Controllers\Controller;
+<?php 
 
-class BookController extends Controller {
-    public function index() {
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Book\BookController;
 
-    }
-
-    public function store() {
-
-    }
-
-    public function show() {
-
-    }
-
-    public function update() {
-
-    }
-
-    public function destroy() {
-
-    }
-}
+Route::post('/books', [BookController::class, 'store'])->name('book.store');
+Route::get('/books/{uuid}', [BookController::class, 'show'])->name('book.show');
+Route::put('/books/{uuid}', [BookController::class, 'update'])->name('book.update');
+Route::delete('/books/{uuid}', [BookController::class, 'destroy'])->name('book.destroy');
