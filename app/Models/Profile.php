@@ -21,8 +21,6 @@ class Profile extends Model
      * @var array
      */
     protected $fillable = [
-        'first_name',
-        'last_name',
         'user_id',
         'bio',
         'avatar',
@@ -31,6 +29,26 @@ class Profile extends Model
         'twitter',
         'is_public',
     ];
+
+    
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+        'user_id' => 'integer',
+        'bio' => 'text',
+        'avatar' => 'string',
+        'instagram' => 'string',
+        'facebook' => 'string',
+        'twitter' => 'string',
+        'is_public' => 'boolean',
+            
+        ];
+    }
 
     protected $hidden = [
         'id',
