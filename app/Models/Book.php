@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Book extends Model
 {
@@ -23,6 +24,16 @@ class Book extends Model
      'description'
         ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->uuid = (string) Str::uuid();
+        });
+    }
+
+
           /**
      * Get the attributes that should be cast.
      *
@@ -31,15 +42,13 @@ class Book extends Model
     protected function casts(): array
     {
         return [
-            'uuid' => 'integer',
             'author_id' => 'integer',
             'name' => 'string',
             'year' => 'datetime:Y',
             'genre' => 'string',
             'cover_img' => 'string',
             'pages' => 'integer',
-            'description' => 'text'
-            
+            'description' => 'string'          
         ];
       }
     
