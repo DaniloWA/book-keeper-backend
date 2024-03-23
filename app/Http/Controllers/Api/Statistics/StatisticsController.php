@@ -18,10 +18,9 @@ class StatisticsController extends Controller
         }
 
         $userStatistics = $book->statistics()->forCurrentUser()->select('status', 'liked')->get();
- 
-        if($userStatistics === null) {
-            return $this->successResponse($userStatistics, 'Dont have any statistics for this book', 200);
 
+        if($userStatistics->isEmpty()) {
+            return $this->successResponse($userStatistics, 'Dont have any statistics for this book', 200);
         }
 
         return $this->successResponse($userStatistics, 'Statistics found', 200);
