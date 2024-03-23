@@ -15,6 +15,7 @@ trait DefaultMessages
             'unique' => 'Someone already picked this [ ' . Str::upper(':attribute') . ' ] try another one!',
             'min' => 'Your [ ' . Str::upper(':attribute') . ' ] must be longer than :min characters',
             'max' => 'Your [ ' . Str::upper(':attribute') . ' ] must be a maximum of :max characters',
+            'status' => 'Your [ ' . Str::upper(':attribute') . ' ] must be one of : read, reading, abandoned, want_to_read',
         ];
     }
 }
