@@ -26,3 +26,6 @@ Route::name('auth.')
 
 Route::name('book')
     ->group(base_path('routes/v1/book.php'));
+
+Route::name('statistics.')
+    ->group(base_path('routes/v1/statistics.php'));

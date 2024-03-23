@@ -10,10 +10,9 @@ class Book extends Model
 {
     use HasFactory;
     
-    
     protected $table = 'books';
     
-    protected $fillable = [  
+    protected $fillable = [
      'uuid',
      'author_id',
      'name',
@@ -34,7 +33,7 @@ class Book extends Model
     }
 
 
-          /**
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -48,15 +47,18 @@ class Book extends Model
             'genre' => 'string',
             'cover_img' => 'string',
             'pages' => 'integer',
-            'description' => 'string'          
+            'description' => 'string'
         ];
-      }
+    }
     
-        public function author()
-        {
-            return $this->belongsTo(Author::class,'author_id','id');
-        }
-
-      
+    public function author()
+    {
+        return $this->belongsTo(Author::class, 'author_id', 'id');
     }
 
+    public function statistics()
+    {
+        return $this->hasMany(Statistics::class, 'book_id', 'id');
+        ;
+    }
+}
