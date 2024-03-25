@@ -20,16 +20,16 @@ class BookController extends Controller {
 
         $book = Book::create($validatedData);
 
-        return response()->json($book, 201);
+        return $this->successResponse($book, 'Book created successfully', 201);
     }
 
     public function show($uuid) {
     $book = Book::where('uuid', $uuid)->first();
 
     if ($book) {
-        return response()->json($book, 200);
+        return $this->successResponse($book, 'Book retrieved successfully');
     } else {
-        return response()->json(['error' => 'Book not found'], 404);
+        return $this->errorResponse('Book not found', 404);
     }
 }
 
@@ -38,9 +38,9 @@ class BookController extends Controller {
 
     if ($book) {
         $book->update($request->validated());
-        return response()->json($book, 200);
+        return $this->successResponse($book, 'Book updated successfully');
     } else {
-        return response()->json(['error' => 'Book not found'], 404);
+        return $this->errorResponse('Book not found', 404);
     }
 }
 
@@ -49,9 +49,9 @@ class BookController extends Controller {
 
     if ($book) {
         $book->delete();
-        return response()->json(['message' => 'Book deleted successfully'], 200);
+        return $this->successResponse([], 'Book deleted successfully');
     } else {
-        return response()->json(['error' => 'Book not found'], 404);
+        return $this->errorResponse('Book not found', 404);
     }
     }
 }
