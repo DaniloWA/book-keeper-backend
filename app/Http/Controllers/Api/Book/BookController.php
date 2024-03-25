@@ -5,10 +5,14 @@ namespace App\Http\Controllers\Api\Book;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BookRequest;
 use App\Models\Book;
+use App\Traits\ApiResponser;
 
 class BookController extends Controller {
+    use ApiResponser;
     public function index() {
+        $books = Book::all();
 
+        return $this->successResponse($books, 'Books retrieved successfully');
     }
 
     public function store(BookRequest $request) {
