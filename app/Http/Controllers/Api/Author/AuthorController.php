@@ -6,21 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthorRequest;
 use App\Models\Author;
 
-class AuthorController extends Controller{
-   /**
-    *
-    *
-    *  @return \Illuminate\Http\Client\Response 
-    */
+class AuthorController extends Controller
+{
+    /**
+     *
+     *
+     *  @return \Illuminate\Http\Client\Response
+     */
     public function index()
     {
         $authors = Author::all();
-        return view('authors.index', compact('authors'));
+        return response()->json($authors, 200);
     }
     /**
     *
     *
-    *  @return \Illuminate\Http\Client\Response 
+    *  @return \Illuminate\Http\Client\Response
     */
 
     //Seeking Author
@@ -28,55 +29,50 @@ class AuthorController extends Controller{
     {
         $author = Author::where('id', $id)-> first();
        
-        if ($author){
+        if ($author) {
             return response()->json($author, 200);
-        }
-        else{
-            return response()->json(['error' => 'Author not found'],404);
+        } else {
+            return response()->json(['error' => 'Author not found'], 404);
         }
     }
 
        
-     //Controller creates a new author
+    //Controller creates a new author
     public function store(AuthorRequest $request)
-     {
+    {
         $validatedData = $request->validated();
 
         $author = Author::create($validatedData);
 
         return response()->json($author, 201);
-     }
+    }
 
-     //Updates the data   
-    public function update(AuthorRequest $request, $id) 
-     {
-            $author = Author::where('id', $id)->first();
+    //Updates the data
+    public function update(AuthorRequest $request, $id)
+    {
+        $author = Author::where('id', $id)->first();
         
-            if ($author) {
-              $author->update($request->validated());
-              return response()->json($author, 200);
-             } 
-            else {
-             return response()->json(['error' => 'Author not found'], 404);
-            }
-     }
+        if ($author) {
+            $author->update($request->validated());
+            return response()->json($author, 200);
+        } else {
+            return response()->json(['error' => 'Author not found'], 404);
+        }
+    }
            
-     // Driver removes the author      
+    // Driver removes the author
     public function destroy($id)
-     {
-          $author = Author::where('id', $id)->first();
+    {
+        $author = Author::where('id', $id)->first();
             
-         if ($author)  {
+        if ($author) {
                
-                  $author->delete();
+            $author->delete();
                    
-                  return response()->json(['message' => 'Author deleted successfully'], 200);
-                } 
-          else {
-                 return response()->json(['error' => 'Author not found'], 404);
-                }
+            return response()->json(['message' => 'Author deleted successfully'], 200);
+        } else {
+            return response()->json(['error' => 'Author not found'], 404);
+        }
                 
-      }   
+    }
 }
-   
-     
