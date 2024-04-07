@@ -17,7 +17,6 @@ class ProfileController extends Controller
     public function index()
     {
         $profiles = Profile::all();
-        $profiles->load('user');
 
         return $this->successResponse(ProfileResource::collection($profiles), 'Profiles retrieved successfully', 200);
     }
@@ -29,19 +28,20 @@ class ProfileController extends Controller
         $payload['user_id'] = $user->id;
 
         $profile = Profile::create($payload);
-        $profile->load('user');
 
         return $this->successResponse(new ProfileResource($profile), 'Profile created successfully', 201);
     }
 
     public function show($slug)
     {
-        $user = User::where('slug', $slug)->firstOrFail();
-        $profile = $user->profile;
+        $user = User::with('profile')->where('slug', $slug)->first();
 
-        if ($profile) {
-            $profile->load('user');
-            return $this->successResponse(new ProfileResource($profile), 'Profile retrieved successfully', 200);
+        if (!$user) {
+            return $this->errorResponse('User not found', 404);
+        }
+
+        if ($user->profile) {
+            return $this->successResponse(new ProfileResource($user->profile), 'Profile retrieved successfully', 200);
         }
 
         return $this->errorResponse('Profile not found', 404);
@@ -49,14 +49,16 @@ class ProfileController extends Controller
 
     public function update(ProfileRequest $request, $slug)
     {
-        $user = User::where('slug', $slug)->firstOrFail();
-        $profile = $user->profile;
+        $user = User::with('profile')->where('slug', $slug)->first();
 
-        if ($profile) {
+        if (!$user) {
+            return $this->errorResponse('User not found', 404);
+        }
+
+        if ($user->profile) {
             $payload = $request->validated();
-            $profile->update($payload);
-            $profile->load('user');
-            return $this->successResponse(new ProfileResource($profile), 'Profile updated successfully', 200);
+            $user->profile->update($payload);
+            return $this->successResponse(new ProfileResource($user->profile), 'Profile updated successfully', 200);
         }
 
         return $this->errorResponse('Profile not found', 404);
@@ -65,12 +67,15 @@ class ProfileController extends Controller
 
     public function destroy($slug)
     {
-        $user = User::where('slug', $slug)->firstOrFail();
-        $profile = $user->profile;
+        $user = User::where('slug', $slug)->first();
 
-        if ($profile) {
-            $profile->delete();
-            return $this->successResponse(null, 'Profile deleted successfully', 204);
+        if (!$user) {
+            return $this->errorResponse('User not found', 404);
+        }
+
+        if ($user->profile) {
+            $user->profile->delete();
+            return $this->successResponse([], 'Profile deleted successfully', 200);
         }
 
         return $this->errorResponse('Profile not found', 404);
