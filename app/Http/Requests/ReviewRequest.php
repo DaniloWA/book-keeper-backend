@@ -22,9 +22,9 @@ class ReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|exists:user,id',
-            'book_id' => 'exists:book,id',
-            'title' => 'required|text',
+            'user_id' => 'required|exists:users,id',
+            'book_uuid' => 'required|exists:books,uuid',
+            'title' => 'required|string',
             'content' => 'nullable|string'
         ];
     }

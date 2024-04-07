@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\Review;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReviewRequest;
+use App\Models\Book;
 use App\Models\Review;
 
 class ReviewController extends Controller
@@ -24,6 +25,9 @@ class ReviewController extends Controller
     {
         $validatedData = $request->validated();
 
+        $book = Book::where('uuid', $validatedData['book_uuid'])->first();
+       
+        $validatedData['book_id'] = $book->id;
         $review = Review::create($validatedData);
 
         return response()->json($review, 201);
@@ -33,7 +37,7 @@ class ReviewController extends Controller
     public function show($id)
     {
         $review = Review::where('id', $id)-> first();
-   
+
         if ($review) {
             return response()->json($review, 200);
         } else {
@@ -41,12 +45,12 @@ class ReviewController extends Controller
         }
     }
 
-  
-    
+
+
     public function update(ReviewRequest $request, $id)
     {
         $review = Review::where('id', $id)->first();
-        
+
         if ($review) {
             $review->update($request->validated());
             return response()->json($review, 200);
@@ -55,19 +59,19 @@ class ReviewController extends Controller
         }
     }
 
-    
+
     public function destroy($id)
     {
         $review  = Review::where('id', $id)->first();
-    
+
         if ($review) {
-        
+
             $review->delete();
-            
+
             return response()->json(['message' => 'Review  deleted successfully'], 200);
         } else {
             return response()->json(['error' => 'Review not found'], 404);
         }
-    
+
     }
 }
