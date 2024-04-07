@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Author;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-class AuthorSeed extends Seeder
+class AuthorSeeder extends Seeder
 {
     /**
      * Run the database seeds.
