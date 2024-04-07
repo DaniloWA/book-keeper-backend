@@ -32,3 +32,6 @@ Route::name('book.')
 
 Route::name('author.')
     ->group(base_path('routes/v1/author.php'));
+
+Route::name('profile.')
+    ->group(base_path('routes/v1/profile.php'));
