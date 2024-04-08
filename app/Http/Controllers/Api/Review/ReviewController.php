@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ReviewRequest;
 use App\Models\Book;
 use App\Models\Review;
+use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
 {
@@ -26,8 +27,9 @@ class ReviewController extends Controller
         $validatedData = $request->validated();
 
         $book = Book::where('uuid', $validatedData['book_uuid'])->first();
-       
+
         $validatedData['book_id'] = $book->id;
+        $validatedData['user_id'] = Auth::id();
         $review = Review::create($validatedData);
 
         return response()->json($review, 201);
