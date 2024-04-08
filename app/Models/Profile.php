@@ -30,7 +30,7 @@ class Profile extends Model
         'is_public',
     ];
 
-    
+
     /**
      * Get the attributes that should be cast.
      *
@@ -39,14 +39,14 @@ class Profile extends Model
     protected function casts(): array
     {
         return [
-        'user_id' => 'integer',
-        'bio' => 'text',
-        'avatar' => 'string',
-        'instagram' => 'string',
-        'facebook' => 'string',
-        'twitter' => 'string',
-        'is_public' => 'boolean',
-            
+            'user_id' => 'integer',
+            'bio' => 'string',
+            'avatar' => 'string',
+            'instagram' => 'string',
+            'facebook' => 'string',
+            'twitter' => 'string',
+            'is_public' => 'boolean',
+
         ];
     }
 
