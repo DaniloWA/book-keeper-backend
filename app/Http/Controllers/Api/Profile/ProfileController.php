@@ -27,9 +27,22 @@ class ProfileController extends Controller
         $payload = $request->validated();
         $payload['user_id'] = $user->id;
 
+        if($user->profile) {
+            $user->profile->update($payload);
+            return $this->successResponse(
+                ProfileResource::make($user->profile),
+                'Profile updated successfully',
+                201
+            );
+        }
+
         $profile = Profile::create($payload);
 
-        return $this->successResponse(new ProfileResource($profile), 'Profile created successfully', 201);
+        return $this->successResponse(
+            ProfileResource::make($profile),
+            'Profile created successfully',
+            201
+        );
     }
 
     public function show($slug)
