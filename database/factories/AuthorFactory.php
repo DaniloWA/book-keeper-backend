@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Author;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,7 +23,6 @@ class AuthorFactory extends Factory
             'last_name'=> $this->faker->lastName,
             'bio'=> $this->faker->paragraph,
             'avatar'=> $this->faker->imageUrl(),
-            
         ];
     }
 }
