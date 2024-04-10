@@ -9,7 +9,8 @@ use App\Models\Review;
 use App\Traits\ApiResponser;
 use Illuminate\Support\Facades\Auth;
 
-class ReviewController extends Controller{
+class ReviewController extends Controller
+{
     use ApiResponser;
     public function index()
     {
@@ -43,7 +44,7 @@ class ReviewController extends Controller{
         $review = Review::where('id', $id)->first();
         if ($review) {
             $review->update($request->validated());
-            return $this->successResponse($review,200);
+            return $this->successResponse($review, 200);
         } else {
             return $this->errorResponse('Review not found', 404);
         }
@@ -54,7 +55,7 @@ class ReviewController extends Controller{
         $review  = Review::where('id', $id)->first();
         if ($review) {
             $review->delete();
-            return $this->successResponse(['message' => 'Review deleted successfully'], 200);
+            return $this->successResponse([], "Review deleted successfully", 200);
         } else {
             return $this->errorResponse('Review not found', 404);
         }
