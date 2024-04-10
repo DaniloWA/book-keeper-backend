@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Book extends Model
 {
@@ -13,15 +14,16 @@ class Book extends Model
     protected $table = 'books';
     
     protected $fillable = [
-     'uuid',
-     'author_id',
-     'name',
-     'year',
-     'genre',
-     'cover_img',
-     'pages',
-     'description'
-        ];
+        'uuid',
+        'author_id',
+        'name',
+        'year',
+        'genre',
+        'cover_img',
+        'pages',
+        'description',
+        'average_rating',
+    ];
 
     protected static function boot()
     {
@@ -29,6 +31,14 @@ class Book extends Model
 
         static::creating(function ($model) {
             $model->uuid = (string) Str::uuid();
+        });
+
+        static::addGlobalScope('rate_count', function ($query) {
+            $query->withCount('ratings');
+        });
+
+        static::addGlobalScope('author_name', function ($query) {
+            $query->with('author:id,first_name,last_name');
         });
     }
 
@@ -47,9 +57,21 @@ class Book extends Model
             'genre' => 'string',
             'cover_img' => 'string',
             'pages' => 'integer',
-            'description' => 'string'
+            'description' => 'string',
+            'average_rating' => 'float',
         ];
     }
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'author_id',
+        'id',
+    ];
+
     
     public function author()
     {
@@ -59,6 +81,25 @@ class Book extends Model
     public function statistics()
     {
         return $this->hasMany(Statistics::class, 'book_id', 'id');
-        ;
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class, 'book_id', 'id');
+    }
+
+    public function rate($score)
+    {
+        $this->ratings()->where('user_id', auth()->user()->id)->delete();
+
+        $this->ratings()->create([
+            'user_id' => auth()->user()->id,
+            'score' => $score
+        ]);
+
+        $averageRating = $this->ratings()->avg('score');
+        $roundedAverageRating = round($averageRating * 2) / 2;
+ 
+        $this->update(['average_rating' => $roundedAverageRating]);
     }
 }
