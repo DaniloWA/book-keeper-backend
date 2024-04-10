@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class BookRequest extends FormRequest
+class BookRequest extends ApiMasterRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,7 +18,7 @@ class BookRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
 
-     public function rules()
+     public function rules(): array
 {
     return [
         'author_id' => 'required|exists:author,id',
