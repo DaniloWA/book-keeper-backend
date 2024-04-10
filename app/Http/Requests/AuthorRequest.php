@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class AuthorRequest extends FormRequest
+class AuthorRequest extends ApiMasterRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -19,13 +17,13 @@ class AuthorRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'first_name' => 'required',
             'last_name' => 'required',
             'bio' => 'nullable|max:255',
-            'avatar' => 'nullable',   
+            'avatar' => 'nullable',
         ];
     }
 }
