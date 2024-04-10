@@ -41,4 +41,59 @@ class ProfileFactory extends Factory
             'is_public' => $this->faker->boolean,
         ];
     }
+
+    /**
+     * Indicate that the profile should be public.
+     */
+    public function public(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'is_public' => true,
+            ];
+        });
+    }
+
+    /**
+     * Indicate that the profile should be private.
+     */
+    public function private(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'is_public' => false,
+            ];
+        });
+    }
+
+    public function noAvatar(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'avatar' => null,
+            ];
+        });
+    }
+
+    public function noSocialLinks(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'instagram' => null,
+                'facebook' => null,
+                'twitter' => null,
+            ];
+        });
+    }
+
+    public function fullSocialLinks(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'instagram' => 'https://instagram.com/' . $this->faker->unique()->userName,
+                'facebook' => 'https://facebook.com/' . $this->faker->unique()->userName,
+                'twitter' => 'https://twitter.com/' . $this->faker->unique()->userName,
+            ];
+        });
+    }
 }
