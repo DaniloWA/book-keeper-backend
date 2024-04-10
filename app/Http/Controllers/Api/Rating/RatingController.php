@@ -40,7 +40,7 @@ class RatingController extends Controller
 
         return $this->successResponse(
             $book->
-                rating()
+                ratings()
                 ->forCurrentUser()
                 ->select('score')
                 ->get(),
