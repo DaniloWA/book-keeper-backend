@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Book;
+use App\Models\Author;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -22,7 +23,7 @@ class BookFactory extends Factory
     {
         return [
             'uuid' => (string) Str::uuid(),
-            'author_id' => 1, // TODO: change this to a random author id
+            'author_id' => Author::factory(),
             'name' => $this->faker->sentence(3),
             'year' => $this->faker->year,
             'genre' => $this->faker->word,
