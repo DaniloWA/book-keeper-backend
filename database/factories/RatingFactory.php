@@ -17,8 +17,9 @@ class RatingFactory extends Factory
     public function definition(): array
     {
         return [
-            'book_uuid' => $this->faker->uuid,
-            'rating' => $this->faker->numberBetween(1, 5),
+            'user_id' => $this->faker->numberBetween(1, 1),
+            'book_id' => $this->faker->numberBetween(1, 1),
+            'score' => $this->faker->numberBetween(1, 5),
         ];
     }
 }
