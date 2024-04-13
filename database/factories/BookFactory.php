@@ -21,9 +21,11 @@ class BookFactory extends Factory
     protected $model = Book::class;
     public function definition(): array
     {
+        $author = Author::inRandomOrder()->first() ?? Author::factory()->create();
+
         return [
             'uuid' => (string) Str::uuid(),
-            'author_id' => Author::factory(),
+            'author_id' => $author->id,
             'name' => $this->faker->sentence(3),
             'year' => $this->faker->year,
             'genre' => $this->faker->word,
