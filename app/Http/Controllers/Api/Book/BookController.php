@@ -32,9 +32,9 @@ class BookController extends Controller
 
         $perPage = $request->input('per_page') ?? 10;
         $page = $request->input('page') ?? 1;
-        
+
         $books = $this->service->getPaginatedBooks($filters, $perPage, $page);
- 
+
         return $this->successResponse($books, 'Books retrieved successfully');
     }
 
@@ -76,7 +76,7 @@ class BookController extends Controller
 
         if ($book) {
             $book->delete();
-            return $this->successResponse([], 'Book deleted successfully', 204);
+            return $this->successResponse([], 'Book deleted successfully', 200);
         } else {
             return $this->errorResponse('Book not found', 404);
         }
