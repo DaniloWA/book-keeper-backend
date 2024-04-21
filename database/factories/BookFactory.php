@@ -25,7 +25,6 @@ class BookFactory extends Factory
             'author_id' => 1, // TODO: change this to a random author id
             'name' => $this->faker->sentence(3),
             'year' => $this->faker->year,
-            'genre' => $this->faker->word,
             'cover_img' => $this->faker->imageUrl(),
             'pages' => $this->faker->randomNumber(3, true),
             'description' => $this->faker->paragraph,

@@ -18,17 +18,17 @@ class BookRequest extends ApiMasterRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
 
-     public function rules(): array
-{
-    return [
-        'author_id' => 'required|exists:author,id',
-        'name' => 'required',
-        'year' => 'required|integer',
-        'genre' => 'required',
-        'cover_img' => 'nullable|url',
-        'pages' => 'required|integer',
-        'description' => 'nullable',
-    ];
-}
-
+    public function rules(): array
+    {
+        return [
+            'author_id' => 'required|exists:author,id',
+            'name' => 'required',
+            'year' => 'required|integer',
+            'genres' => 'required|array',
+            'genres.*' => 'exists:genres,id',
+            'cover_img' => 'nullable|url',
+            'pages' => 'required|integer',
+            'description' => 'nullable',
+        ];
+    }
 }
