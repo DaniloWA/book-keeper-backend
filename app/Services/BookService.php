@@ -2,12 +2,16 @@
 
 namespace App\Services;
 
+use App\Traits\ApiResponser;
 use App\Models\Book;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Validator;
 
 class BookService
 {
+    use ApiResponser;
+
     protected $book;
 
     public function __construct(Book $book)
@@ -25,7 +29,8 @@ class BookService
     public function applyFilters(Builder $query, array $filters): Builder
     {
         $query = $this->filterByAuthors($query, $filters['authors']);
-        
+        $query = $this->filterByRating($query, $filters);
+
         return $query;
     }
 
@@ -45,6 +50,35 @@ class BookService
         }
 
         return $query;
+    }
+
+
+    private function filterByRating(Builder $query, $filters): Builder
+    {
+        (int) $startRating = $filters['start_rating'];
+        (int) $endRating =  $filters['end_rating'];
+         
+        Validator::make($filters, [
+            'start_rating' => 'nullable|numeric|between:0,5|less_than:end_rating',
+            'end_rating' => 'nullable|numeric|between:0,5',
+        ])->validate();
+
+        if (isset($startRating) && isset($endRating)) {
+            return $query->whereBetween('average_rating', [$startRating, $endRating]);
+        }
+
+         if (isset($startRating) && !isset($endRating)) {
+            return  $query->where('average_rating', $startRating);
+        }
+
+        return $query;
+    }
+
+    private function checkRatingFilter($startRating, $endRating) {
+            if (!is_numeric($startRating) || !is_numeric($endRating)) {
+    
+                $this->errorResponse('Rating must be a number', 400);
+            }
     }
 
     /**
