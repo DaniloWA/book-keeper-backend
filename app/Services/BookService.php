@@ -31,6 +31,7 @@ class BookService
         $query = $this->filterByAuthors($query, $filters['authors']);
         $query = $this->filterByRating($query, $filters);
 
+
         return $query;
     }
 
@@ -45,7 +46,7 @@ class BookService
     {
         if (isset($authorsID)) {
             $authorsID = explode(',', $authorsID);
- 
+
             $query->whereIn('author_id', $authorsID);
         }
 
@@ -92,7 +93,7 @@ class BookService
      */
     public function getPaginatedBooks(array $filters, int $perPage, int $page): LengthAwarePaginator
     {
-        $query = $this->book->newQuery();
+        $query = $this->book->withGenres()->withAuthor()->withRatings()->newQuery();
         $this->applyFilters($query, $filters);
 
         return $query->paginate($perPage, ['*'], 'page', $page);

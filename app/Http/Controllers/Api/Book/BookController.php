@@ -7,6 +7,7 @@ use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
 use App\Http\Requests\BookRequest;
 use App\Http\Controllers\Controller;
+use App\Models\BookGenre;
 use App\Services\BookService;
 
 class BookController extends Controller
@@ -34,35 +35,50 @@ class BookController extends Controller
 
         $perPage = $request->input('per_page') ?? 10;
         $page = $request->input('page') ?? 1;
-        
+
         $books = $this->service->getPaginatedBooks($filters, $perPage, $page);
- 
+
         return $this->successResponse($books, 'Books retrieved successfully');
     }
 
     public function store(BookRequest $request)
     {
-        $validatedData = $request->validated();
+        $payload = $request->validated();
 
-        $book = $this->book->create($validatedData);
+        $book = $this->book->create($payload);
+
+        $genres = $payload['genres'];
+        $genresCount = count($genres);
+        $totalGenres = 0;
+
+        do {
+            BookGenre::create([
+                'book_id' => $book->id,
+                'genre_id' => $genres[$totalGenres]
+            ]);
+
+            $totalGenres++;
+        } while ($totalGenres < $genresCount);
+
+        $book = $this->book->withGenres()->withAuthor()->withRatings()->find($book->id);
 
         return $this->successResponse($book, 'Book created successfully', 201);
     }
 
     public function show($uuid)
     {
-        $book = $this->book->where('uuid', $uuid)->first();
+        $book = $this->book->withGenres()->withAuthor()->withRatings()->where('uuid', $uuid)->first();
 
-        if ($book) {
-            return $this->successResponse($book, 'Book retrieved successfully', 200);
-        } else {
+        if (!$book) {
             return $this->errorResponse('Book not found', 404);
         }
+
+        return $this->successResponse($book, 'Book retrieved successfully', 200);
     }
 
     public function update(BookRequest $request, $uuid)
     {
-        $book = $this->book->where('uuid', $uuid)->first();
+        $book = $this->book->withGenres()->withAuthor()->withRatings()->where('uuid', $uuid)->first();
 
         if ($book) {
             $book->update($request->validated());
@@ -78,7 +94,7 @@ class BookController extends Controller
 
         if ($book) {
             $book->delete();
-            return $this->successResponse([], 'Book deleted successfully', 204);
+            return $this->successResponse([], 'Book deleted successfully', 200);
         } else {
             return $this->errorResponse('Book not found', 404);
         }
