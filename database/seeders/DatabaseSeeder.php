@@ -15,12 +15,12 @@ class DatabaseSeeder extends Seeder
     {
 
         $this->call([
+            UserSeeder::class,
             AuthorSeeder::class,
             BookSeeder::class,
             StatisticsSeeder::class,
             ReviewSeeder::class,
             ProfileSeeder::class,
         ]);
-
     }
 }
