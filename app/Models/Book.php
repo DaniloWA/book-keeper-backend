@@ -21,6 +21,7 @@ class Book extends Model
         'cover_img',
         'pages',
         'description',
+        'country',
         'average_rating',
     ];
 
@@ -48,6 +49,7 @@ class Book extends Model
             'cover_img' => 'string',
             'pages' => 'integer',
             'description' => 'string',
+            'country' => 'string',
             'average_rating' => 'float',
         ];
     }

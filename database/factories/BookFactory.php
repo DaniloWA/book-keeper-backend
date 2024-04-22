@@ -28,6 +28,7 @@ class BookFactory extends Factory
             'cover_img' => $this->faker->imageUrl(),
             'pages' => $this->faker->randomNumber(3, true),
             'description' => $this->faker->paragraph,
+            'country' => $this->faker->country,
         ];
     }
 }
