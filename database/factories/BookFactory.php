@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Author;
 use App\Models\Book;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -22,7 +23,7 @@ class BookFactory extends Factory
     {
         return [
             'uuid' => (string) Str::uuid(),
-            'author_id' => 1, // TODO: change this to a random author id
+            'author_id' => Author::inRandomOrder()->first()->id ?? Author::factory(),
             'name' => $this->faker->sentence(3),
             'year' => $this->faker->year,
             'cover_img' => $this->faker->imageUrl(),
@@ -30,5 +31,33 @@ class BookFactory extends Factory
             'description' => $this->faker->paragraph,
             'country' => $this->faker->country,
         ];
+    }
+
+    public function withSpecificAttribute($attribute, $value): Factory
+    {
+        return $this->state(function (array $attributes) use ($attribute, $value) {
+            return [
+                $attribute => $value,
+            ];
+        });
+    }
+
+    public function withYearRange($min, $max): Factory
+    {
+        return $this->state(function (array $attributes) use ($min, $max) {
+            return [
+                'year' => $this->faker->numberBetween($min, $max),
+            ];
+        });
+    }
+
+
+    public function withPageRange($min, $max): Factory
+    {
+        return $this->state(function (array $attributes) use ($min, $max) {
+            return [
+                'pages' => $this->faker->numberBetween($min, $max),
+            ];
+        });
     }
 }
