@@ -14,7 +14,7 @@ class Author extends Model
      *
      * @var string
      */
-    protected $table = 'author';
+    protected $table = 'authors';
 
 
     /**
@@ -52,5 +52,10 @@ class Author extends Model
             'bio' => 'string',
             'avatar' => 'string',
         ];
+    }
+
+    public function books()
+    {
+        return $this->hasMany(Book::class);
     }
 }

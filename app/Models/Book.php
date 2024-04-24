@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Statistic;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
@@ -70,7 +71,7 @@ class Book extends Model
 
     public function statistics()
     {
-        return $this->hasMany(Statistics::class, 'book_id', 'id');
+        return $this->hasMany(Statistic::class, 'book_id', 'id');
     }
 
     public function ratings()

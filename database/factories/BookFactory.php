@@ -3,8 +3,9 @@
 namespace Database\Factories;
 
 use App\Models\Book;
-use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Author;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Book>
@@ -21,8 +22,8 @@ class BookFactory extends Factory
     public function definition(): array
     {
         return [
+            'author_id' => Author::factory()->create()->id,
             'uuid' => (string) Str::uuid(),
-            'author_id' => 1, // TODO: change this to a random author id
             'name' => $this->faker->sentence(3),
             'year' => $this->faker->year,
             'cover_img' => $this->faker->imageUrl(),
