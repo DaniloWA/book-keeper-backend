@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('pages');
             $table->text('description');
 
-            $table->foreign('author_id')->references('id')->on('author');
+            $table->foreign('author_id')->references('id')->on('authors');
 
             $table->timestamps();
         });
