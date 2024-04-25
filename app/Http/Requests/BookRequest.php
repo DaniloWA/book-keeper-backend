@@ -29,6 +29,7 @@ class BookRequest extends ApiMasterRequest
             'cover_img' => 'nullable|url',
             'pages' => 'required|integer',
             'description' => 'nullable',
+            'country' => 'required|string',
         ];
     }
 }
