@@ -21,7 +21,7 @@ class BookRequest extends ApiMasterRequest
     public function rules(): array
     {
         return [
-            'author_id' => 'required|exists:author,id',
+            'author_id' => 'required|exists:authors,id',
             'name' => 'required',
             'year' => 'required|integer',
             'genres' => 'required|array',
