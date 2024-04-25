@@ -30,9 +30,6 @@ class ProfileFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => $this->user ? $this->user->id : function () {
-                return User::factory()->create()->id;
-            },
             'bio' => $this->faker->text(200),
             'avatar' => $this->faker->imageUrl(640, 480, 'avatar'),
             'instagram' => 'https://instagram.com/' . $this->faker->userName,

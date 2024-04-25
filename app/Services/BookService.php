@@ -60,7 +60,7 @@ class BookService
         (int) $endRating =  $filters['end_rating'];
          
         Validator::make($filters, [
-            'start_rating' => 'nullable|numeric|between:0,5|less_than:end_rating',
+            'start_rating' => 'nullable|numeric|between:0,5',
             'end_rating' => 'nullable|numeric|between:0,5',
         ])->validate();
 
