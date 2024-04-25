@@ -21,8 +21,8 @@ class BookGenreFactory extends Factory
     public function definition(): array
     {
         return [
-            'book_id' => Book::inRandomOrder()->first()->id ?? Book::factory()->create()->id,
-            'genre_id' => Genre::inRandomOrder()->first()->id ?? Genre::factory()->create()->id
+            'book_id' => Book::inRandomOrder()->first()->id,
+            'genre_id' => Genre::inRandomOrder()->first()->id
         ];
     }
 }

@@ -15,13 +15,6 @@ class BookGenreSeeder extends Seeder
      */
     public function run(): void
     {
-        // Could use chunk method here to avoid memory issues
-        $books = Book::all();
-
-        foreach ($books as $book) {
-            BookGenre::factory()->count(rand(1, 3))->create([
-                'book_id' => $book->id
-            ]);
-        }
+        BookGenre::factory()->count(rand(1, 3))->create();
     }
 }
