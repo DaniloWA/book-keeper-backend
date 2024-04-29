@@ -7,6 +7,7 @@ use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
 use App\Http\Requests\BookRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\LastReadedsBooksResource;
 use App\Models\BookGenre;
 use App\Services\BookService;
 
@@ -39,6 +40,18 @@ class BookController extends Controller
         $books = $this->service->getPaginatedBooks($filters, $perPage, $page);
 
         return $this->successResponse($books, 'Books retrieved successfully');
+    }
+
+    public function lastReadeds(Request $request) {
+        $numberOfBooks = $request->input('num_books') ?? 10;
+        
+        $lastBooksReadeds = $this->service->getLastReadedBooks($numberOfBooks);
+
+        if (!$lastBooksReadeds || count($lastBooksReadeds) == 0) {
+            return $this->successResponse([], 'No books readed yet');
+        }
+
+        return $this->successResponse(LastReadedsBooksResource::collection($lastBooksReadeds), 'Last books readed retrieved successfully');
     }
 
     public function store(BookRequest $request)
