@@ -8,6 +8,7 @@ Route::group(
     function () {
         Route::post('/books', [BookController::class, 'store'])->name('store');
         Route::get('/books', [BookController::class, 'index'])->name('index');
+        Route::get('/books/last-readeds', [BookController::class, 'lastReadeds'])->name('lastReadeds');
         Route::get('/books/{uuid}', [BookController::class, 'show'])->name('show');
         Route::put('/books/{uuid}', [BookController::class, 'update'])->name('update');
         Route::delete('/books/{uuid}', [BookController::class, 'destroy'])->name('destroy');
