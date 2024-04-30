@@ -15,6 +15,12 @@ class BookGenreSeeder extends Seeder
      */
     public function run(): void
     {
-        BookGenre::factory()->count(rand(1, 3))->create();
+        $books = Book::all();
+
+        foreach ($books as $book) {
+            BookGenre::factory()->count(rand(1, 3))->create([
+                'book_id' => $book->id
+            ]);
+        }
     }
 }

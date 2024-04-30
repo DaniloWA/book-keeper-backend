@@ -30,6 +30,7 @@ class BookService
     {
         $query = $this->filterByAuthors($query, $filters['authors']);
         $query = $this->filterByRating($query, $filters);
+        $query = $this->filterByGenres($query, $filters['genres']);
 
 
         return $query;
@@ -53,12 +54,24 @@ class BookService
         return $query;
     }
 
+    private function filterByGenres(Builder $query, $genres): Builder
+    {
+        if (isset($genres)) {
+            $genreIds = explode(',', $genres);
+            return $query->whereHas('genres', function ($query) use ($genreIds) {
+                $query->whereIn('genres.id', $genreIds);
+            });
+        }
+
+        return $query;
+    }
+
 
     private function filterByRating(Builder $query, $filters): Builder
     {
         (int) $startRating = $filters['start_rating'];
         (int) $endRating =  $filters['end_rating'];
-         
+
         Validator::make($filters, [
             'start_rating' => 'nullable|numeric|between:0,5',
             'end_rating' => 'nullable|numeric|between:0,5',
@@ -68,18 +81,19 @@ class BookService
             return $query->whereBetween('average_rating', [$startRating, $endRating]);
         }
 
-         if (isset($startRating) && !isset($endRating)) {
+        if (isset($startRating) && !isset($endRating)) {
             return  $query->where('average_rating', $startRating);
         }
 
         return $query;
     }
 
-    private function checkRatingFilter($startRating, $endRating) {
-            if (!is_numeric($startRating) || !is_numeric($endRating)) {
-    
-                $this->errorResponse('Rating must be a number', 400);
-            }
+    private function checkRatingFilter($startRating, $endRating)
+    {
+        if (!is_numeric($startRating) || !is_numeric($endRating)) {
+
+            $this->errorResponse('Rating must be a number', 400);
+        }
     }
 
     /**
