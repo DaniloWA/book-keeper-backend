@@ -100,14 +100,14 @@ class BookService
         return $query->paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function getLastReadedBooks($numberOfBooks = 10)
+    public function getLastreadBooks($numberOfBooks = 10)
     {
-        $lastBooksReadeds = Statistic::forCurrentUser()
+        $lastBooksRead = Statistic::forCurrentUser()
             ->where('status', 'read')
             ->orderBy('id', 'desc')
             ->take($numberOfBooks)
             ->get();
 
-        return $lastBooksReadeds;
+        return $lastBooksRead;
     }
 }
