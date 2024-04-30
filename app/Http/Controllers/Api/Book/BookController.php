@@ -29,6 +29,7 @@ class BookController extends Controller
             'authors',
             'start_rating',
             'end_rating',
+            'genres',
         ];
 
         $filters = $request->only($allowedFilters);
