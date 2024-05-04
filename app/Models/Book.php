@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Statistic;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
@@ -10,18 +11,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Book extends Model
 {
     use HasFactory;
-    
+
     protected $table = 'books';
-    
+
     protected $fillable = [
         'uuid',
         'author_id',
         'name',
         'year',
-        'genre',
         'cover_img',
         'pages',
         'description',
+        'country',
         'average_rating',
     ];
 
@@ -31,14 +32,6 @@ class Book extends Model
 
         static::creating(function ($model) {
             $model->uuid = (string) Str::uuid();
-        });
-
-        static::addGlobalScope('rate_count', function ($query) {
-            $query->withCount('ratings');
-        });
-
-        static::addGlobalScope('author_name', function ($query) {
-            $query->with('author:id,first_name,last_name');
         });
     }
 
@@ -54,10 +47,10 @@ class Book extends Model
             'author_id' => 'integer',
             'name' => 'string',
             'year' => 'datetime:Y',
-            'genre' => 'string',
             'cover_img' => 'string',
             'pages' => 'integer',
             'description' => 'string',
+            'country' => 'string',
             'average_rating' => 'float',
         ];
     }
@@ -72,7 +65,7 @@ class Book extends Model
         'id',
     ];
 
-    
+
     public function author()
     {
         return $this->belongsTo(Author::class, 'author_id', 'id');
@@ -80,12 +73,17 @@ class Book extends Model
 
     public function statistics()
     {
-        return $this->hasMany(Statistics::class, 'book_id', 'id');
+        return $this->hasMany(Statistic::class, 'book_id', 'id');
     }
 
     public function ratings()
     {
         return $this->hasMany(Rating::class, 'book_id', 'id');
+    }
+
+    public function genres()
+    {
+        return $this->belongsToMany(Genre::class, 'book_genres', 'book_id', 'genre_id');
     }
 
     public function rate($score)
@@ -99,7 +97,26 @@ class Book extends Model
 
         $averageRating = $this->ratings()->avg('score');
         $roundedAverageRating = round($averageRating * 2) / 2;
- 
+
         $this->update(['average_rating' => $roundedAverageRating]);
+    }
+
+    public function scopeWithGenres($query)
+    {
+        return $query->with([
+            'genres' => function ($query) {
+                $query->select('genres.id', 'genres.name');
+            }
+        ]);
+    }
+
+    public function scopeWithAuthor($query)
+    {
+        return $query->with('author:id,first_name,last_name');
+    }
+
+    public function scopeWithRatings($query)
+    {
+        return $query->withCount('ratings');
     }
 }

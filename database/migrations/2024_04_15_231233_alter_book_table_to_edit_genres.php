@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('authors', function (Blueprint $table) {
-             $table->text('bio')->nullable()->change();
-             $table->string('avatar')->nullable()->change();
-
+        Schema::table('books', function (Blueprint $table) {
+            $table->dropColumn('genre');
         });
     }
 
@@ -23,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-
+        Schema::table('book', function (Blueprint $table) {
+            //
+        });
     }
 };

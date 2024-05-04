@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Book;
 use App\Models\User;
-use App\Models\Statistics;
+use App\Models\Statistic;
 use App\Exceptions\InvalidApiStatusException;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -13,9 +13,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  *
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Statistics>
  */
-class StatisticsFactory extends Factory
+class StatisticFactory extends Factory
 {
-    protected $model = Statistics::class;
+    protected $model = Statistic::class;
     
     // User and Book variables to store the specified user and book
     private $user;
@@ -49,18 +49,12 @@ class StatisticsFactory extends Factory
      * Define the model's default state.
      *
      * @return array<string, mixed>
-     */
-    public function definition(): array
+     */        
+    public function definition()
     {
         return [
-            'user_id' => $this->user ? $this->user->id : function () {
-                return User::factory()->create()->id;
-            },
-            'book_id' => $this->book ? $this->book->id : function () {
-                return Book::factory()->create()->id;
-            },
             'status' => $this->faker->randomElement(['read', 'reading', 'abandoned', 'want_to_read']),
-            'liked' => $this->faker->boolean(),
+            'liked' => $this->faker->boolean(60),  
         ];
     }
 

@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Middleware\ForceJsonResponse;
+use App\Http\Middleware\ForceJsonResponseMiddleware;
+use App\Http\Middleware\SafeTransactionMiddleware;
 use Illuminate\Http\Request;
 use App\Http\Resources\ApiResponse;
 use Illuminate\Support\Facades\Log;
@@ -21,7 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->append(ForceJsonResponse::class);
+        $middleware->append(ForceJsonResponseMiddleware::class);
+        $middleware->append(SafeTransactionMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->dontReportDuplicates();

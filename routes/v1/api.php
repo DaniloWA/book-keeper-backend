@@ -33,6 +33,9 @@ Route::name('rating.')
 Route::name('book.')
     ->group(base_path('routes/v1/book.php'));
 
+Route::name('genre.')
+    ->group(base_path('routes/v1/genre.php'));
+
 Route::name('author.')
     ->group(base_path('routes/v1/author.php'));
 
@@ -41,4 +44,3 @@ Route::name('review.')
 
 Route::name('profile.')
     ->group(base_path('routes/v1/profile.php'));
-

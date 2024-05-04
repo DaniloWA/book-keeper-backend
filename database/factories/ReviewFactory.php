@@ -22,8 +22,8 @@ class ReviewFactory extends Factory
     {
         $user = User::inRandomOrder()->first() ?? User::factory()->create();
         $book = Book::inRandomOrder()->first() ?? Book::factory()->create();
+      
             return [
-
                 'user_id' => $this->faker->numberBetween(1, 1),
                 'book_id' => $this->faker->numberBetween(1, 1),
                 'title' => $this->faker->sentence(),
