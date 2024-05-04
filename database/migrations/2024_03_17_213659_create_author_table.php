@@ -14,8 +14,8 @@ return new class extends Migration {
             $table->id();
             $table->string('first_name');
             $table->string('last_name');
-            $table->text('bio');
-            $table->string('avatar');
+            $table->text('bio')->nullable();
+            $table->string('avatar')->nullable();
             $table->timestamps();
         });
     }

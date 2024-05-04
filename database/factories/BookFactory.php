@@ -4,6 +4,8 @@ namespace Database\Factories;
 
 use App\Models\Author;
 use App\Models\Book;
+use App\Models\Author;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -21,9 +23,11 @@ class BookFactory extends Factory
     protected $model = Book::class;
     public function definition(): array
     {
+        $author = Author::inRandomOrder()->first() ?? Author::factory()->create();
+
         return [
             'uuid' => (string) Str::uuid(),
-            'author_id' => Author::inRandomOrder()->first()->id ?? Author::factory(),
+            'author_id' => $author->id,
             'name' => $this->faker->sentence(3),
             'year' => $this->faker->year,
             'cover_img' => $this->faker->imageUrl(),
