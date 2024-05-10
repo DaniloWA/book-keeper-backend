@@ -32,7 +32,19 @@ class BookService
         $query = $this->filterByAuthors($query, $filters['authors']);
         $query = $this->filterByRating($query, $filters);
         $query = $this->filterByGenres($query, $filters['genres']);
+        $query = $this->search($query, $filters['search']);
 
+
+        return $query;
+    }
+
+    public function search(Builder $query, $search)
+    {
+        if (isset($search)) {
+             
+            $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('description', 'like', '%' . $search . '%');
+        }
 
         return $query;
     }
