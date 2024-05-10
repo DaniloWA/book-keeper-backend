@@ -32,7 +32,23 @@ class BookService
         $query = $this->filterByAuthors($query, $filters['authors']);
         $query = $this->filterByRating($query, $filters);
         $query = $this->filterByGenres($query, $filters['genres']);
+        $query = $this->filterByStatus($query, $filters['status'] ?? null);
 
+        return $query;
+    }
+
+    public function filterByStatus(Builder $query, $status): Builder
+    {
+        if (isset($status)) {
+            $status = Validator::make(['status' => $status], [
+                'status' => 'nullable|in:read,reading,abandoned,want_to_read',
+           ])->validated();
+
+            $query->whereHas('statistics', function ($query) use ($status) {
+                $query->where('user_id', auth()->id());
+                $query->where('status', $status);
+            });
+        }
 
         return $query;
     }
@@ -106,7 +122,12 @@ class BookService
      */
     public function getPaginatedBooks(array $filters, int $perPage, int $page): LengthAwarePaginator
     {
-        $query = $this->book->withGenres()->withAuthor()->withRatings()->newQuery();
+        $query = $this->book
+            ->withGenres()
+            ->withAuthor()
+            ->withRatings()
+            ->newQuery();
+        
         $this->applyFilters($query, $filters);
 
         return $query->paginate($perPage, ['*'], 'page', $page);
