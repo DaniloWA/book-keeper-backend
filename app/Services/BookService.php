@@ -32,10 +32,46 @@ class BookService
         $query = $this->filterByAuthors($query, $filters['authors']);
         $query = $this->filterByRating($query, $filters);
         $query = $this->filterByGenres($query, $filters['genres']);
-
+        $query = $this->orderBy($query, $filters['order_by'] ?? null, $filters['order_direction'] ?? 'asc');
 
         return $query;
     }
+
+    public function orderBy(Builder $query, $orderBy, $orderDirection)
+    {
+        $orderByMapping = [
+            'author' => 'author_id',
+            'rating' => 'average_rating',
+            // 'genre' => 'genres.name',
+            'name' => 'name',
+            'year' => 'year',
+            'average_rating' => 'average_rating',
+            'pages' => 'pages',
+            'country' => 'country',
+        ];
+
+        $orderDirections = [
+            'asc',
+            'desc',
+        ];
+
+        $orderBy = strtolower($orderBy);
+        
+        if (!in_array($orderDirection, $orderDirections)) {
+            $orderDirection = 'asc';
+        }
+
+        if (array_key_exists($orderBy, $orderByMapping)) {
+            $orderByField = $orderByMapping[$orderBy];
+    
+            if ($orderByField !== null) {
+                return $query->orderBy($orderByField, $orderDirection);
+            }
+        }
+    
+        return $query;
+    }
+    
 
     /**
      * Filters the query by the provided author IDs.
