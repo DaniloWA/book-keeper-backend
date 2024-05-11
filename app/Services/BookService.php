@@ -29,13 +29,36 @@ class BookService
      */
     public function applyFilters(Builder $query, array $filters): Builder
     {
-        $query = $this->filterByAuthors($query, $filters['authors']);
+        $query = $this->filterByAuthors($query, $filters['authors'] ?? null);
         $query = $this->filterByRating($query, $filters);
-        $query = $this->filterByGenres($query, $filters['genres']);
+        $query = $this->filterByGenres($query, $filters['genres'] ?? null);
+        $query = $this->filterByYear($query, $filters);
 
 
         return $query;
     }
+
+    private function filterByYear(Builder $query, $filters): Builder
+    {
+        $startYear = $filters['start_year'] ?? null;
+        $endYear = $filters['end_year'] ?? null;
+
+        Validator::make($filters, [
+            'start_year' => 'nullable|digits:4|integer',
+            'end_year' => 'nullable|digits:4|integer',
+        ])->validate();
+ 
+        if (isset($startYear) && isset($endYear)) {
+            $query->whereBetween('year', [(int) $startYear, (int) $endYear]);
+        }
+        
+        if (isset($startYear) && !isset($endYear)) {
+            $query->where('year', (int) $startYear);
+        }
+    
+        return $query;
+    }
+
 
     /**
      * Filters the query by the provided author IDs.
@@ -69,8 +92,8 @@ class BookService
 
     private function filterByRating(Builder $query, $filters): Builder
     {
-        (int) $startRating = $filters['start_rating'];
-        (int) $endRating =  $filters['end_rating'];
+        (int) $startRating = $filters['start_rating'] ?? null;
+        (int) $endRating =  $filters['end_rating'] ?? null;
 
         Validator::make($filters, [
             'start_rating' => 'nullable|numeric|between:0,5',

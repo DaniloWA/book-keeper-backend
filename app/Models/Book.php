@@ -46,7 +46,7 @@ class Book extends Model
         return [
             'author_id' => 'integer',
             'name' => 'string',
-            'year' => 'datetime:Y',
+            'year' => 'string',
             'cover_img' => 'string',
             'pages' => 'integer',
             'description' => 'string',
