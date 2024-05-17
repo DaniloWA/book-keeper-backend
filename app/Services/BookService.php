@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Traits\ApiResponser;
 use App\Models\Book;
+use App\Models\Review;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Validator;
@@ -31,6 +32,7 @@ class BookService
         $query = $this->filterByAuthors($query, $filters['authors']);
         $query = $this->filterByRating($query, $filters);
         $query = $this->filterByGenres($query, $filters['genres']);
+        $query = $this->filterByReviews($query, $filters);
 
 
         return $query;
@@ -94,6 +96,34 @@ class BookService
 
             $this->errorResponse('Rating must be a number', 400);
         }
+    }
+
+    private function filterByReviews(Builder $query, $filters): Builder
+    {
+        Validator::make($filters, [
+            'min_reviews' => 'nullable|numeric',
+            'max_reviews' => 'nullable|numeric',
+        ])->validate();
+
+        $minReviews = isset($filters['min_reviews']) ? (int) $filters['min_reviews'] : null;
+        $maxReviews = isset($filters['max_reviews']) ? (int) $filters['max_reviews'] : null;
+
+        $query->withCount('reviews');
+
+        if ($minReviews !== null && $maxReviews !== null) {
+            return $query->having('reviews_count', '>=', $minReviews)
+                ->having('reviews_count', '<=', $maxReviews);
+        }
+
+        if ($minReviews !== null) {
+            return $query->having('reviews_count', '>=', $minReviews);
+        }
+
+        if ($maxReviews !== null) {
+            return $query->having('reviews_count', '<=', $maxReviews);
+        }
+
+        return $query;
     }
 
     /**
