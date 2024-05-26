@@ -24,5 +24,25 @@ class AuthorFactory extends Factory
             'bio'=> $this->faker->paragraph,
             'avatar'=> $this->faker->imageUrl(),
         ];
+
     }
+
+public function male(): static
+{
+    return $this->state(function (array $attributes) {
+        return [
+            'first_name' => $this->faker->firstNameMale,
+        ];
+    });
+}
+
+public function female(): static
+{
+    return $this->state(function (array $attributes) {
+        return [
+            'first_name' => $this->faker->firstNameFemale,
+        ];
+    });
+}
+
 }

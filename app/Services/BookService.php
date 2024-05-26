@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Traits\ApiResponser;
 use App\Models\Book;
 use App\Models\Review;
+use App\Models\Statistic;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Validator;
@@ -68,7 +69,6 @@ class BookService
         return $query;
     }
 
-
     private function filterByRating(Builder $query, $filters): Builder
     {
         (int) $startRating = $filters['start_rating'];
@@ -93,7 +93,6 @@ class BookService
     private function checkRatingFilter($startRating, $endRating)
     {
         if (!is_numeric($startRating) || !is_numeric($endRating)) {
-
             $this->errorResponse('Rating must be a number', 400);
         }
     }
@@ -141,5 +140,16 @@ class BookService
         $this->applyFilters($query, $filters);
 
         return $query->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function getLastreadBooks($numberOfBooks = 10)
+    {
+        $lastBooksRead = Statistic::forCurrentUser()
+            ->where('status', 'read')
+            ->orderBy('id', 'desc')
+            ->take($numberOfBooks)
+            ->get();
+
+        return $lastBooksRead;
     }
 }
