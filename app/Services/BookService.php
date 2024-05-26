@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Traits\ApiResponser;
 use App\Models\Book;
+use App\Models\Review;
 use App\Models\Statistic;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -29,8 +30,10 @@ class BookService
      */
     public function applyFilters(Builder $query, array $filters): Builder
     {
-        $query = $this->filterByAuthors($query, $filters['authors']);
+        $query = $this->filterByAuthors($query, $filters['authors'] ?? null);
         $query = $this->filterByRating($query, $filters);
+        $query = $this->filterByGenres($query, $filters['genres'] ?? null);
+        $query = $this->filterByYear($query, $filters);
         $query = $this->filterByGenres($query, $filters['genres']);
         $query = $this->filterByStatus($query, $filters['status'] ?? null);
 
@@ -49,9 +52,35 @@ class BookService
                 $query->where('status', $status);
             });
         }
+      
+        $query = $this->filterByPages($query, $filters);
+        $query = $this->filterByReviews($query, $filters);
 
         return $query;
     }
+
+
+    private function filterByYear(Builder $query, $filters): Builder
+    {
+        $startYear = $filters['start_year'] ?? null;
+        $endYear = $filters['end_year'] ?? null;
+
+        Validator::make($filters, [
+            'start_year' => 'nullable|digits:4|integer',
+            'end_year' => 'nullable|digits:4|integer',
+        ])->validate();
+ 
+        if (isset($startYear) && isset($endYear)) {
+            $query->whereBetween('year', [(int) $startYear, (int) $endYear]);
+        }
+        
+        if (isset($startYear) && !isset($endYear)) {
+            $query->where('year', (int) $startYear);
+        }
+    
+        return $query;
+    }
+
 
     /**
      * Filters the query by the provided author IDs.
@@ -85,8 +114,8 @@ class BookService
 
     private function filterByRating(Builder $query, $filters): Builder
     {
-        (int) $startRating = $filters['start_rating'];
-        (int) $endRating =  $filters['end_rating'];
+        (int) $startRating = $filters['start_rating'] ?? null;
+        (int) $endRating =  $filters['end_rating'] ?? null;
 
         Validator::make($filters, [
             'start_rating' => 'nullable|numeric|between:0,5',
@@ -104,11 +133,61 @@ class BookService
         return $query;
     }
 
+    private function filterByPages(Builder $query, $filters): Builder
+    {
+        (int) $startPages = $filters['start_pages'];
+        (int) $endPages =  $filters['end_pages'];
+
+        Validator::make($filters, [
+            'start_pages' => 'nullable|numeric',
+            'end_pages' => 'nullable|numeric',
+        ])->validate();
+
+        if (isset($startPages) && isset($endPages)) {
+            return $query->whereBetween('pages', [$startPages, $endPages]);
+        }
+
+        if (isset($startPages) && !isset($endPages)) {
+            return  $query->where('pages', $startPages);
+        }
+
+        return $query;
+    }
+
+
     private function checkRatingFilter($startRating, $endRating)
     {
         if (!is_numeric($startRating) || !is_numeric($endRating)) {
             $this->errorResponse('Rating must be a number', 400);
         }
+    }
+
+    private function filterByReviews(Builder $query, $filters): Builder
+    {
+        Validator::make($filters, [
+            'min_reviews' => 'nullable|numeric',
+            'max_reviews' => 'nullable|numeric',
+        ])->validate();
+
+        $minReviews = isset($filters['min_reviews']) ? (int) $filters['min_reviews'] : null;
+        $maxReviews = isset($filters['max_reviews']) ? (int) $filters['max_reviews'] : null;
+
+        $query->withCount('reviews');
+
+        if ($minReviews !== null && $maxReviews !== null) {
+            return $query->having('reviews_count', '>=', $minReviews)
+                ->having('reviews_count', '<=', $maxReviews);
+        }
+
+        if ($minReviews !== null) {
+            return $query->having('reviews_count', '>=', $minReviews);
+        }
+
+        if ($maxReviews !== null) {
+            return $query->having('reviews_count', '<=', $maxReviews);
+        }
+
+        return $query;
     }
 
     /**
