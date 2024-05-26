@@ -32,6 +32,8 @@ class BookController extends Controller
             'end_rating',
             'start_pages',
             'end_pages',
+            'min_reviews',
+            'max_reviews',
             'genres',
         ];
 
