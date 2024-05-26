@@ -35,6 +35,7 @@ class BookController extends Controller
             'min_reviews',
             'max_reviews',
             'genres',
+            'status'
             'start_year',
             'end_year',
         ];
