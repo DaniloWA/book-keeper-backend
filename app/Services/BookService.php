@@ -34,9 +34,10 @@ class BookService
         $query = $this->filterByRating($query, $filters);
         $query = $this->filterByGenres($query, $filters['genres'] ?? null);
         $query = $this->filterByYear($query, $filters);
-        $query = $this->filterByGenres($query, $filters['genres']);
         $query = $this->filterByStatus($query, $filters['status'] ?? null);
-
+        $query = $this->filterByPages($query, $filters);
+        $query = $this->filterByReviews($query, $filters);
+        
         return $query;
     }
 
@@ -52,9 +53,6 @@ class BookService
                 $query->where('status', $status);
             });
         }
-      
-        $query = $this->filterByPages($query, $filters);
-        $query = $this->filterByReviews($query, $filters);
 
         return $query;
     }
