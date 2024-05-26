@@ -33,8 +33,8 @@ class BookService
         $query = $this->filterByAuthors($query, $filters['authors']);
         $query = $this->filterByRating($query, $filters);
         $query = $this->filterByGenres($query, $filters['genres']);
+        $query = $this->filterByPages($query, $filters);
         $query = $this->filterByReviews($query, $filters);
-
 
         return $query;
     }
@@ -89,6 +89,28 @@ class BookService
 
         return $query;
     }
+
+    private function filterByPages(Builder $query, $filters): Builder
+    {
+        (int) $startPages = $filters['start_pages'];
+        (int) $endPages =  $filters['end_pages'];
+
+        Validator::make($filters, [
+            'start_pages' => 'nullable|numeric',
+            'end_pages' => 'nullable|numeric',
+        ])->validate();
+
+        if (isset($startPages) && isset($endPages)) {
+            return $query->whereBetween('pages', [$startPages, $endPages]);
+        }
+
+        if (isset($startPages) && !isset($endPages)) {
+            return  $query->where('pages', $startPages);
+        }
+
+        return $query;
+    }
+
 
     private function checkRatingFilter($startRating, $endRating)
     {
