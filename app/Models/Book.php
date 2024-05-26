@@ -86,6 +86,11 @@ class Book extends Model
         return $this->belongsToMany(Genre::class, 'book_genres', 'book_id', 'genre_id');
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'book_id', 'id');
+    }
+
     public function rate($score)
     {
         $this->ratings()->where('user_id', auth()->user()->id)->delete();
