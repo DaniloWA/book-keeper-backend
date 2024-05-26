@@ -7,7 +7,7 @@ use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
 use App\Http\Requests\BookRequest;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\lastReadBooksResource;
+use App\Http\Resources\LastReadBooksResource;
 use App\Models\BookGenre;
 use App\Services\BookService;
 
@@ -35,6 +35,8 @@ class BookController extends Controller
             'min_reviews',
             'max_reviews',
             'genres',
+            'start_year',
+            'end_year',
         ];
 
         $filters = $request->only($allowedFilters);
@@ -57,7 +59,7 @@ class BookController extends Controller
             return $this->successResponse([], 'No books read yet');
         }
 
-        return $this->successResponse(lastReadBooksResource::collection($lastBooksRead), 'Last books read retrieved successfully');
+        return $this->successResponse(LastReadBooksResource::collection($lastBooksRead), 'Last books read retrieved successfully');
     }
 
     public function store(BookRequest $request)
