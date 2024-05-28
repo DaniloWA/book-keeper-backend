@@ -173,8 +173,7 @@ class BookService
         $query->withCount('reviews');
 
         if (isset($minReviews) && isset($maxReviews)) {
-            return $query->having('reviews_count', '>=', $minReviews)
-                ->having('reviews_count', '<=', $maxReviews);
+            return $query->having('reviews_count', '>=', $minReviews)->having('reviews_count', '<=', $maxReviews);
         }
 
         if (isset($minReviews)) {
