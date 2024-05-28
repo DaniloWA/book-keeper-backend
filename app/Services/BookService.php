@@ -37,7 +37,7 @@ class BookService
         $query = $this->filterByStatus($query, $filters['status'] ?? null);
         $query = $this->filterByPages($query, $filters);
         $query = $this->filterByReviews($query, $filters);
-        
+
         return $query;
     }
 
@@ -46,7 +46,7 @@ class BookService
         if (isset($status)) {
             $status = Validator::make(['status' => $status], [
                 'status' => 'nullable|in:read,reading,abandoned,want_to_read',
-           ])->validated();
+            ])->validated();
 
             $query->whereHas('statistics', function ($query) use ($status) {
                 $query->where('user_id', auth()->id());
@@ -67,15 +67,15 @@ class BookService
             'start_year' => 'nullable|digits:4|integer',
             'end_year' => 'nullable|digits:4|integer',
         ])->validate();
- 
+
         if (isset($startYear) && isset($endYear)) {
             $query->whereBetween('year', [(int) $startYear, (int) $endYear]);
         }
-        
+
         if (isset($startYear) && !isset($endYear)) {
             $query->where('year', (int) $startYear);
         }
-    
+
         return $query;
     }
 
@@ -133,8 +133,8 @@ class BookService
 
     private function filterByPages(Builder $query, $filters): Builder
     {
-        (int) $startPages = $filters['start_pages'];
-        (int) $endPages =  $filters['end_pages'];
+        $startPages = isset($filters['start_pages']) ? (int) $filters['start_pages'] : null;
+        $endPages = isset($filters['end_pages']) ? (int) $filters['end_pages'] : null;
 
         Validator::make($filters, [
             'start_pages' => 'nullable|numeric',
@@ -204,7 +204,7 @@ class BookService
             ->withAuthor()
             ->withRatings()
             ->newQuery();
-        
+
         $this->applyFilters($query, $filters);
 
         return $query->paginate($perPage, ['*'], 'page', $page);
