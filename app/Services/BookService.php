@@ -32,6 +32,7 @@ class BookService
     {
         $query = $this->filterByAuthors($query, $filters['authors'] ?? null);
         $query = $this->filterByRating($query, $filters);
+        $query = $this->search($query, $filters['search'] ?? null);
         $query = $this->filterByGenres($query, $filters['genres'] ?? null);
         $query = $this->filterByYear($query, $filters);
         $query = $this->filterByStatus($query, $filters['status'] ?? null);
@@ -79,6 +80,16 @@ class BookService
         return $query;
     }
 
+    public function search(Builder $query, $search)
+    {
+        if (isset($search)) {
+             
+            $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('description', 'like', '%' . $search . '%');
+        }
+
+        return $query;
+    }
 
     /**
      * Filters the query by the provided author IDs.

@@ -35,9 +35,10 @@ class BookController extends Controller
             'min_reviews',
             'max_reviews',
             'genres',
+            'search',
             'status',
             'start_year',
-            'end_year',
+            'end_year'
         ];
 
         $filters = $request->only($allowedFilters);
