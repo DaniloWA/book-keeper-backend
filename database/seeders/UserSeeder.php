@@ -26,7 +26,12 @@ class UserSeeder extends Seeder
                     'book_id' => $book->id,
                 ]);
                 $user->statistics()->save($statistic);
+            }
 
+            $reviewCount = rand(1, 10);
+            $booksForReview = $books->random($reviewCount);
+
+            foreach ($booksForReview as $book) {
                 $review = Review::factory()->make([
                     'user_id' => $user->id,
                     'book_id' => $book->id,

@@ -46,7 +46,7 @@ class Book extends Model
         return [
             'author_id' => 'integer',
             'name' => 'string',
-            'year' => 'datetime:Y',
+            'year' => 'string',
             'cover_img' => 'string',
             'pages' => 'integer',
             'description' => 'string',
@@ -84,6 +84,11 @@ class Book extends Model
     public function genres()
     {
         return $this->belongsToMany(Genre::class, 'book_genres', 'book_id', 'genre_id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'book_id', 'id');
     }
 
     public function rate($score)
