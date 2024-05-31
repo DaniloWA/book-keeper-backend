@@ -122,15 +122,6 @@ class BookService
             $query->where('name', 'like', '%' . $search . '%')
                 ->orWhere('description', 'like', '%' . $search . '%');
         }
-
-        if (array_key_exists($orderBy, $orderByMapping)) {
-            $orderByField = $orderByMapping[$orderBy];
-    
-            if ($orderByField !== null) {
-                return $query->orderBy($orderByField, $orderDirection);
-            }
-        }
-    
         return $query;
     }
     
