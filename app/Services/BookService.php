@@ -74,8 +74,6 @@ class BookService
                 return $query->orderBy($orderByField, $orderDirection);
             }
         }
-
-        
         return $query;
     }
 
@@ -84,7 +82,7 @@ class BookService
         if (isset($status)) {
             $status = Validator::make(['status' => $status], [
                 'status' => 'nullable|in:read,reading,abandoned,want_to_read',
-           ])->validated();
+            ])->validated();
 
             $query->whereHas('statistics', function ($query) use ($status) {
                 $query->where('user_id', auth()->id());
@@ -105,15 +103,15 @@ class BookService
             'start_year' => 'nullable|digits:4|integer',
             'end_year' => 'nullable|digits:4|integer',
         ])->validate();
- 
+
         if (isset($startYear) && isset($endYear)) {
             $query->whereBetween('year', [(int) $startYear, (int) $endYear]);
         }
-        
+
         if (isset($startYear) && !isset($endYear)) {
             $query->where('year', (int) $startYear);
         }
-    
+
         return $query;
     }
 
@@ -228,21 +226,21 @@ class BookService
 
         $query->withCount('reviews');
 
-        if ($minReviews !== null && $maxReviews !== null) {
-            return $query->having('reviews_count', '>=', $minReviews)
-                ->having('reviews_count', '<=', $maxReviews);
+        if (isset($minReviews) && isset($maxReviews)) {
+            return $query->having('reviews_count', '>=', $minReviews)->having('reviews_count', '<=', $maxReviews);
         }
 
-        if ($minReviews !== null) {
-            return $query->having('reviews_count', '>=', $minReviews);
+        if (isset($minReviews)) {
+            return $query->having('reviews_count', '=', $minReviews);
         }
 
-        if ($maxReviews !== null) {
+        if (isset($maxReviews)) {
             return $query->having('reviews_count', '<=', $maxReviews);
         }
 
         return $query;
     }
+
 
     /**
      * Retrieves a paginated list of tasks based on specified filters.
@@ -260,7 +258,7 @@ class BookService
             ->withAuthor()
             ->withRatings()
             ->newQuery();
-        
+
         $this->applyFilters($query, $filters);
 
         return $query->paginate($perPage, ['*'], 'page', $page);
