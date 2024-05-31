@@ -30,6 +30,7 @@ class BookService
      */
     public function applyFilters(Builder $query, array $filters): Builder
     {
+        $query = $this->search($query, $filters['search'] ?? null);
         $query = $this->filterByAuthors($query, $filters['authors'] ?? null);
         $query = $this->filterByRating($query, $filters);
         $query = $this->filterByGenres($query, $filters['genres'] ?? null);
@@ -37,6 +38,42 @@ class BookService
         $query = $this->filterByStatus($query, $filters['status'] ?? null);
         $query = $this->filterByPages($query, $filters);
         $query = $this->filterByReviews($query, $filters);
+        $query = $this->orderBy($query, $filters['order_by'] ?? null, $filters['order_direction'] ?? 'asc');
+      
+        return $query;
+    }
+
+    public function orderBy(Builder $query, $orderBy, $orderDirection)
+    {
+        $orderByMapping = [
+            'author' => 'author_id',
+            'rating' => 'average_rating',
+            // 'genre' => 'genres.name',
+            'name' => 'name',
+            'year' => 'year',
+            'average_rating' => 'average_rating',
+            'pages' => 'pages',
+            'country' => 'country',
+        ];
+
+        $orderDirections = [
+            'asc',
+            'desc',
+        ];
+
+        $orderBy = strtolower($orderBy);
+        
+        if (!in_array($orderDirection, $orderDirections)) {
+            $orderDirection = 'asc';
+        }
+
+        if (array_key_exists($orderBy, $orderByMapping)) {
+            $orderByField = $orderByMapping[$orderBy];
+    
+            if ($orderByField !== null) {
+                return $query->orderBy($orderByField, $orderDirection);
+            }
+        }
 
         return $query;
     }
@@ -79,6 +116,24 @@ class BookService
         return $query;
     }
 
+    public function search(Builder $query, $search)
+    {
+        if (isset($search)) {
+            $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('description', 'like', '%' . $search . '%');
+        }
+
+        if (array_key_exists($orderBy, $orderByMapping)) {
+            $orderByField = $orderByMapping[$orderBy];
+    
+            if ($orderByField !== null) {
+                return $query->orderBy($orderByField, $orderDirection);
+            }
+        }
+    
+        return $query;
+    }
+    
 
     /**
      * Filters the query by the provided author IDs.
@@ -172,21 +227,21 @@ class BookService
 
         $query->withCount('reviews');
 
-        if ($minReviews !== null && $maxReviews !== null) {
-            return $query->having('reviews_count', '>=', $minReviews)
-                ->having('reviews_count', '<=', $maxReviews);
+        if (isset($minReviews) && isset($maxReviews)) {
+            return $query->having('reviews_count', '>=', $minReviews)->having('reviews_count', '<=', $maxReviews);
         }
 
-        if ($minReviews !== null) {
-            return $query->having('reviews_count', '>=', $minReviews);
+        if (isset($minReviews)) {
+            return $query->having('reviews_count', '=', $minReviews);
         }
 
-        if ($maxReviews !== null) {
+        if (isset($maxReviews)) {
             return $query->having('reviews_count', '<=', $maxReviews);
         }
 
         return $query;
     }
+
 
     /**
      * Retrieves a paginated list of tasks based on specified filters.
