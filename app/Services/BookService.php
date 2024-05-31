@@ -74,6 +74,7 @@ class BookService
                 return $query->orderBy($orderByField, $orderDirection);
             }
         }
+
         return $query;
     }
 
@@ -187,8 +188,8 @@ class BookService
 
     private function filterByPages(Builder $query, $filters): Builder
     {
-        (int) $startPages = $filters['start_pages'];
-        (int) $endPages =  $filters['end_pages'];
+        $startPages = isset($filters['start_pages']) ? (int) $filters['start_pages'] : null;
+        $endPages = isset($filters['end_pages']) ? (int) $filters['end_pages'] : null;
 
         Validator::make($filters, [
             'start_pages' => 'nullable|numeric',
