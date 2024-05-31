@@ -35,6 +35,8 @@ class BookController extends Controller
             'min_reviews',
             'max_reviews',
             'genres',
+            'order_by',
+            'order_direction',
             'search',
             'status',
             'start_year',

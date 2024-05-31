@@ -30,14 +30,51 @@ class BookService
      */
     public function applyFilters(Builder $query, array $filters): Builder
     {
+        $query = $this->search($query, $filters['search'] ?? null);
         $query = $this->filterByAuthors($query, $filters['authors'] ?? null);
         $query = $this->filterByRating($query, $filters);
-        $query = $this->search($query, $filters['search'] ?? null);
         $query = $this->filterByGenres($query, $filters['genres'] ?? null);
         $query = $this->filterByYear($query, $filters);
         $query = $this->filterByStatus($query, $filters['status'] ?? null);
         $query = $this->filterByPages($query, $filters);
         $query = $this->filterByReviews($query, $filters);
+        $query = $this->orderBy($query, $filters['order_by'] ?? null, $filters['order_direction'] ?? 'asc');
+      
+        return $query;
+    }
+
+    public function orderBy(Builder $query, $orderBy, $orderDirection)
+    {
+        $orderByMapping = [
+            'author' => 'author_id',
+            'rating' => 'average_rating',
+            // 'genre' => 'genres.name',
+            'name' => 'name',
+            'year' => 'year',
+            'average_rating' => 'average_rating',
+            'pages' => 'pages',
+            'country' => 'country',
+        ];
+
+        $orderDirections = [
+            'asc',
+            'desc',
+        ];
+
+        $orderBy = strtolower($orderBy);
+        
+        if (!in_array($orderDirection, $orderDirections)) {
+            $orderDirection = 'asc';
+        }
+
+        if (array_key_exists($orderBy, $orderByMapping)) {
+            $orderByField = $orderByMapping[$orderBy];
+    
+            if ($orderByField !== null) {
+                return $query->orderBy($orderByField, $orderDirection);
+            }
+        }
+
         
         return $query;
     }
@@ -83,13 +120,21 @@ class BookService
     public function search(Builder $query, $search)
     {
         if (isset($search)) {
-             
             $query->where('name', 'like', '%' . $search . '%')
                 ->orWhere('description', 'like', '%' . $search . '%');
         }
 
+        if (array_key_exists($orderBy, $orderByMapping)) {
+            $orderByField = $orderByMapping[$orderBy];
+    
+            if ($orderByField !== null) {
+                return $query->orderBy($orderByField, $orderDirection);
+            }
+        }
+    
         return $query;
     }
+    
 
     /**
      * Filters the query by the provided author IDs.
