@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Traits\ApiResponser;
 use App\Models\Book;
+use App\Models\Review;
 use App\Models\Statistic;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -29,11 +30,16 @@ class BookService
      */
     public function applyFilters(Builder $query, array $filters): Builder
     {
-        $query = $this->filterByAuthors($query, $filters['authors']);
+        $query = $this->search($query, $filters['search'] ?? null);
+        $query = $this->filterByAuthors($query, $filters['authors'] ?? null);
         $query = $this->filterByRating($query, $filters);
-        $query = $this->filterByGenres($query, $filters['genres']);
+        $query = $this->filterByGenres($query, $filters['genres'] ?? null);
+        $query = $this->filterByYear($query, $filters);
+        $query = $this->filterByStatus($query, $filters['status'] ?? null);
+        $query = $this->filterByPages($query, $filters);
+        $query = $this->filterByReviews($query, $filters);
         $query = $this->orderBy($query, $filters['order_by'] ?? null, $filters['order_direction'] ?? 'asc');
-
+      
         return $query;
     }
 
@@ -59,6 +65,63 @@ class BookService
         
         if (!in_array($orderDirection, $orderDirections)) {
             $orderDirection = 'asc';
+        }
+
+        if (array_key_exists($orderBy, $orderByMapping)) {
+            $orderByField = $orderByMapping[$orderBy];
+    
+            if ($orderByField !== null) {
+                return $query->orderBy($orderByField, $orderDirection);
+            }
+        }
+
+        
+        return $query;
+    }
+
+    public function filterByStatus(Builder $query, $status): Builder
+    {
+        if (isset($status)) {
+            $status = Validator::make(['status' => $status], [
+                'status' => 'nullable|in:read,reading,abandoned,want_to_read',
+           ])->validated();
+
+            $query->whereHas('statistics', function ($query) use ($status) {
+                $query->where('user_id', auth()->id());
+                $query->where('status', $status);
+            });
+        }
+
+        return $query;
+    }
+
+
+    private function filterByYear(Builder $query, $filters): Builder
+    {
+        $startYear = $filters['start_year'] ?? null;
+        $endYear = $filters['end_year'] ?? null;
+
+        Validator::make($filters, [
+            'start_year' => 'nullable|digits:4|integer',
+            'end_year' => 'nullable|digits:4|integer',
+        ])->validate();
+ 
+        if (isset($startYear) && isset($endYear)) {
+            $query->whereBetween('year', [(int) $startYear, (int) $endYear]);
+        }
+        
+        if (isset($startYear) && !isset($endYear)) {
+            $query->where('year', (int) $startYear);
+        }
+    
+        return $query;
+    }
+
+    public function search(Builder $query, $search)
+    {
+        if (isset($search)) {
+            $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('description', 'like', '%' . $search . '%');
         }
 
         if (array_key_exists($orderBy, $orderByMapping)) {
@@ -105,8 +168,8 @@ class BookService
 
     private function filterByRating(Builder $query, $filters): Builder
     {
-        (int) $startRating = $filters['start_rating'];
-        (int) $endRating =  $filters['end_rating'];
+        (int) $startRating = $filters['start_rating'] ?? null;
+        (int) $endRating =  $filters['end_rating'] ?? null;
 
         Validator::make($filters, [
             'start_rating' => 'nullable|numeric|between:0,5',
@@ -124,11 +187,61 @@ class BookService
         return $query;
     }
 
+    private function filterByPages(Builder $query, $filters): Builder
+    {
+        (int) $startPages = $filters['start_pages'];
+        (int) $endPages =  $filters['end_pages'];
+
+        Validator::make($filters, [
+            'start_pages' => 'nullable|numeric',
+            'end_pages' => 'nullable|numeric',
+        ])->validate();
+
+        if (isset($startPages) && isset($endPages)) {
+            return $query->whereBetween('pages', [$startPages, $endPages]);
+        }
+
+        if (isset($startPages) && !isset($endPages)) {
+            return  $query->where('pages', $startPages);
+        }
+
+        return $query;
+    }
+
+
     private function checkRatingFilter($startRating, $endRating)
     {
         if (!is_numeric($startRating) || !is_numeric($endRating)) {
             $this->errorResponse('Rating must be a number', 400);
         }
+    }
+
+    private function filterByReviews(Builder $query, $filters): Builder
+    {
+        Validator::make($filters, [
+            'min_reviews' => 'nullable|numeric',
+            'max_reviews' => 'nullable|numeric',
+        ])->validate();
+
+        $minReviews = isset($filters['min_reviews']) ? (int) $filters['min_reviews'] : null;
+        $maxReviews = isset($filters['max_reviews']) ? (int) $filters['max_reviews'] : null;
+
+        $query->withCount('reviews');
+
+        if ($minReviews !== null && $maxReviews !== null) {
+            return $query->having('reviews_count', '>=', $minReviews)
+                ->having('reviews_count', '<=', $maxReviews);
+        }
+
+        if ($minReviews !== null) {
+            return $query->having('reviews_count', '>=', $minReviews);
+        }
+
+        if ($maxReviews !== null) {
+            return $query->having('reviews_count', '<=', $maxReviews);
+        }
+
+        return $query;
     }
 
     /**
@@ -142,7 +255,12 @@ class BookService
      */
     public function getPaginatedBooks(array $filters, int $perPage, int $page): LengthAwarePaginator
     {
-        $query = $this->book->withGenres()->withAuthor()->withRatings()->newQuery();
+        $query = $this->book
+            ->withGenres()
+            ->withAuthor()
+            ->withRatings()
+            ->newQuery();
+        
         $this->applyFilters($query, $filters);
 
         return $query->paginate($perPage, ['*'], 'page', $page);
