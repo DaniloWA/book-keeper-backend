@@ -24,6 +24,9 @@ Route::get('/', function (Request $request) {
 Route::name('auth.')
     ->group(base_path('routes/v1/auth.php'));
 
+Route::name('user.')
+    ->group(base_path('routes/v1/user.php'));
+
 Route::name('statistics.')
     ->group(base_path('routes/v1/statistics.php'));
 
