@@ -37,10 +37,11 @@ class BookController extends Controller
             'genres',
             'order_by',
             'order_direction',
-            'search',
+            'search_books',
             'status',
             'start_year',
             'end_year',
+            "search_author"
             'min_likes',
             'max_likes'
         ];
@@ -51,7 +52,7 @@ class BookController extends Controller
         $page = $request->input('page') ?? 1;
 
         $books = $this->service->getPaginatedBooks($filters, $perPage, $page);
-
+        
         return $this->successResponse($books, 'Books retrieved successfully');
     }
 
