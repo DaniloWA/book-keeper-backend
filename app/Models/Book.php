@@ -124,4 +124,9 @@ class Book extends Model
     {
         return $query->withCount('ratings');
     }
+
+    public function scopeWithStatistics($query)
+    {
+        return $query->with('statistics');
+    }
 }

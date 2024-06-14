@@ -38,8 +38,10 @@ class BookService
         $query = $this->filterByStatus($query, $filters['status'] ?? null);
         $query = $this->filterByPages($query, $filters);
         $query = $this->filterByReviews($query, $filters);
+        $query = $this->filterByLikes($query, $filters);
+        $query = $this->filterByRead($query);
         $query = $this->orderBy($query, $filters['order_by'] ?? null, $filters['order_direction'] ?? 'asc');
-      
+
         return $query;
     }
 
@@ -48,12 +50,15 @@ class BookService
         $orderByMapping = [
             'author' => 'author_id',
             'rating' => 'average_rating',
+            'rating' => 'ratings_count',
             // 'genre' => 'genres.name',
             'name' => 'name',
             'year' => 'year',
             'average_rating' => 'average_rating',
             'pages' => 'pages',
             'country' => 'country',
+            'likes' => 'likes_count',
+            'read' => 'read_count',
         ];
 
         $orderDirections = [
@@ -62,14 +67,14 @@ class BookService
         ];
 
         $orderBy = strtolower($orderBy);
-        
+
         if (!in_array($orderDirection, $orderDirections)) {
             $orderDirection = 'asc';
         }
 
         if (array_key_exists($orderBy, $orderByMapping)) {
             $orderByField = $orderByMapping[$orderBy];
-    
+
             if ($orderByField !== null) {
                 return $query->orderBy($orderByField, $orderDirection);
             }
@@ -124,7 +129,7 @@ class BookService
         }
         return $query;
     }
-    
+
 
     /**
      * Filters the query by the provided author IDs.
@@ -233,6 +238,44 @@ class BookService
         return $query;
     }
 
+    private function filterByLikes(Builder $query, $filters): Builder
+    {
+        Validator::make($filters, [
+            'min_likes' => 'nullable|numeric',
+            'max_likes' => 'nullable|numeric',
+        ])->validate();
+
+        $minLikes = isset($filters['min_likes']) ? (int) $filters['min_likes'] : null;
+        $maxLikes = isset($filters['max_likes']) ? (int) $filters['max_likes'] : null;
+
+        $query->withCount(['statistics as likes_count' => function ($query) {
+            $query->where('liked', true);
+        }]);
+
+        if (isset($minLikes) && isset($maxLikes)) {
+            return $query->having('likes_count', '>=', $minLikes)->having('likes_count', '<=', $maxLikes);
+        }
+
+        if (isset($minLikes)) {
+            return $query->having('likes_count', '>=', $minLikes);
+        }
+
+        if (isset($maxLikes)) {
+            return $query->having('likes_count', '<=', $maxLikes);
+        }
+
+        return $query;
+    }
+
+    private function filterByRead(Builder $query): Builder
+    {
+        $query->withCount(['statistics as read_count' => function ($query) {
+            $query->where('status', 'read');
+        }]);
+
+        return $query;
+    }
+
 
     /**
      * Retrieves a paginated list of tasks based on specified filters.
@@ -249,6 +292,7 @@ class BookService
             ->withGenres()
             ->withAuthor()
             ->withRatings()
+            ->withStatistics()
             ->newQuery();
 
         $this->applyFilters($query, $filters);
