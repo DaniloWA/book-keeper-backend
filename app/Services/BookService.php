@@ -30,7 +30,8 @@ class BookService
      */
     public function applyFilters(Builder $query, array $filters): Builder
     {
-        $query = $this->search($query, $filters['search'] ?? null);
+        $query = $this->searchBooksNameAndDescription($query, $filters['search_books'] ?? null);
+        $query = $this->filterSearchAuthor($query, $filters['search_author'] ?? null);
         $query = $this->filterByAuthors($query, $filters['authors'] ?? null);
         $query = $this->filterByRating($query, $filters);
         $query = $this->filterByGenres($query, $filters['genres'] ?? null);
@@ -42,8 +43,8 @@ class BookService
       
         return $query;
     }
-
-    public function orderBy(Builder $query, $orderBy, $orderDirection)
+    
+    public function orderBy(Builder $query, $orderBy, $orderDirection): Builder
     {
         $orderByMapping = [
             'author' => 'author_id',
@@ -116,15 +117,26 @@ class BookService
         return $query;
     }
 
-    public function search(Builder $query, $search)
+    public function searchBooksNameAndDescription(Builder $query, $search_book): Builder
     {
-        if (isset($search)) {
-            $query->where('name', 'like', '%' . $search . '%')
-                ->orWhere('description', 'like', '%' . $search . '%');
+        if (isset($search_book)) {
+            $query->where('name', 'like', '%' . $search_book . '%')
+                ->orWhere('description', 'like', '%' . $search_book . '%');
         }
         return $query;
     }
-    
+
+    private function filterSearchAuthor(Builder $query, $search_author): Builder
+    {
+        if (isset($search_author)) {
+            $query->whereHas('author', function ($query) use ($search_author) {
+                $query->where('first_name', 'like', '%' . $search_author . '%')
+                    ->orWhere('last_name', 'like', '%' . $search_author . '%');
+            });
+        }
+
+        return $query;
+    }
 
     /**
      * Filters the query by the provided author IDs.
@@ -252,7 +264,6 @@ class BookService
             ->newQuery();
 
         $this->applyFilters($query, $filters);
-
         return $query->paginate($perPage, ['*'], 'page', $page);
     }
 
