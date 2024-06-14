@@ -40,7 +40,9 @@ class BookController extends Controller
             'search',
             'status',
             'start_year',
-            'end_year'
+            'end_year',
+            'min_likes',
+            'max_likes'
         ];
 
         $filters = $request->only($allowedFilters);
@@ -56,7 +58,7 @@ class BookController extends Controller
     public function lastRead(Request $request)
     {
         $numberOfBooks = $request->input('num_books') ?? 10;
-        
+
         $lastBooksRead = $this->service->getLastreadBooks($numberOfBooks);
 
         if (!$lastBooksRead || count($lastBooksRead) == 0) {
