@@ -297,6 +297,11 @@ class BookService
 
         $this->applyFilters($query, $filters);
 
+        if (!empty($filters['countries'])) {
+            $countries = explode(',', $filters['countries']);
+            $query->whereIn('country', $countries);
+        }
+
         return $query->paginate($perPage, ['*'], 'page', $page);
     }
 
