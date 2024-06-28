@@ -8,13 +8,22 @@ use App\Models\Book;
 use App\Models\Review;
 use App\Traits\ApiResponser;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
     use ApiResponser;
-    public function index()
+
+    public function index(Request $request)
     {
-        $reviews = Review::all();
+        $query = Review::query();
+
+        if ($request->has('is_positive')) {
+            $isPositive = filter_var($request->input('is_positive'), FILTER_VALIDATE_BOOLEAN);
+            $query->where('is_positive', $isPositive);
+        }
+
+        $reviews = $query->get();
         return $this->successResponse($reviews, 200);
     }
 
@@ -31,7 +40,7 @@ class ReviewController extends Controller
 
     public function show($id)
     {
-        $review = Review::where('id', $id)-> first();
+        $review = Review::where('id', $id)->first();
         if ($review) {
             return $this->successResponse($review, 200);
         } else {
@@ -52,7 +61,7 @@ class ReviewController extends Controller
 
     public function destroy($id)
     {
-        $review  = Review::where('id', $id)->first();
+        $review = Review::where('id', $id)->first();
         if ($review) {
             $review->delete();
             return $this->successResponse([], "Review deleted successfully", 200);
