@@ -42,7 +42,8 @@ class BookController extends Controller
             'start_year',
             'end_year',
             'min_likes',
-            'max_likes'
+            'max_likes',
+            'countries'
         ];
 
         $filters = $request->only($allowedFilters);
